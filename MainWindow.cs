@@ -5,55 +5,47 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
-
-namespace HelloWorld
+namespace AstronomyPictureOfTheDay
 {
-    public class Payload
-    {
-        public string copyright { get; set; }
-
-        public DateTime date { get; set; }
-
-        public string explanation { get; set; }
-
-        public string hdurl { get; set; }
-
-        public string media_type { get; set; }
-
-        public string service_version { get; set; }
-
-        public string title { get; set; }
-
-        public string url { get; set; }
-    }
-
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DateTime date = new DateTime(2020, 08, 24);
-
         private Payload Adof = null;
 
         public MainWindow()
         {
             InitializeComponent();
+            this.UpdateAdof();
         }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
+            this.UpdateAdof();
+        }
+
+        private void UpdateAdof()
+        {
             this.Adof = this.GetAdof();
-            TitleTextBox.Text = this.Adof.title;
-            ExplanationTextBox.Text = this.Adof.explanation;
-            ImageViewer1.Source = this.GetImage();
+
+            if(TitleTextBox!=null)
+                TitleTextBox.Text = this.Adof.title;
+
+            if(ExplanationTextBox!=null)
+                ExplanationTextBox.Text = this.Adof.explanation;
+
+            if(ImageViewer1!=null)
+                ImageViewer1.Source = this.GetImage();
+
         }
 
         private Payload GetAdof()
         {
-            return JsonSerializer.Deserialize<Payload>(File.ReadAllText($".\\Samples\\APOD_{this.date:yyyy-MM-dd}.json"));
+            return JsonSerializer.Deserialize<Payload>(File.ReadAllText($".\\Samples\\APOD_{DatePicker.SelectedDate:yyyy-MM-dd}.json"));
         }
         
         private BitmapImage GetImage()
@@ -65,6 +57,11 @@ namespace HelloWorld
             bitmap.UriSource = new Uri(selectedFileName, UriKind.Relative);
             bitmap.EndInit();
             return bitmap;
+        }
+
+        private void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            this.UpdateAdof();
         }
     }
 }

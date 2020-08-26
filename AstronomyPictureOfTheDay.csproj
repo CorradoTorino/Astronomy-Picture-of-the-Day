@@ -10,8 +10,8 @@
     <ProjectGuid>{DDBCF377-2D29-440D-9FDB-02B4936E2D80}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HelloWorld</RootNamespace>
-    <AssemblyName>HelloWorld</AssemblyName>
+    <RootNamespace>AstronomyPictureOfTheDay</RootNamespace>
+    <AssemblyName>AstronomyPictureOfTheDay</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -52,6 +52,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Payload.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\Resources.Designer.cs">

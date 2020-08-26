@@ -3,7 +3,7 @@
 
 using System.Windows;
 
-namespace HelloWorld
+namespace AstronomyPictureOfTheDay
 {
     /// <summary>
     ///     Interaction logic for App.xaml
