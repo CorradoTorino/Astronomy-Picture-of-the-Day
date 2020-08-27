@@ -2,7 +2,7 @@
 
 namespace AstronomyPictureOfTheDay
 {
-    public class Payload
+    public class AstronomyPictureOfTheDayResponse
     {
         public string copyright { get; set; }
 
