@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,15 +18,18 @@ namespace AstronomyPictureOfTheDay
     public partial class MainWindow : Window
     {
         private AstronomyPictureOfTheDayResponse astronomyPictureOfTheDay = null;
+
+        private readonly string NasaApiKey;
         
         public MainWindow()
         {
             InitializeComponent();
-            //this.DisplayAstronomyPictureOfTheDay();
+            this.NasaApiKey = Environment.GetEnvironmentVariable("NASA_API_KEY") ?? "DEMO_KEY";
         }
 
         private async void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
         {
+            this.DisplayTransitionScreen();
             try
             {
                 await this.DisplayAstronomyPictureOfTheDay();
@@ -40,18 +42,14 @@ namespace AstronomyPictureOfTheDay
 
         private void DisplayErrorScreen(Exception exception)
         {
-            if (TitleTextBox != null)
-                TitleTextBox.Text = "Ops.. Something went wrong..";
-            
-            if (ExplanationTextBox != null)
-                ExplanationTextBox.Text = exception.Message;
+            this.TitleTextBox.Text = "Ops.. Something went wrong..";
+            this.ExplanationTextBox.Text = exception.Message;
 
-            if (ImageViewer1 != null)
-            {
-                var uri = new Uri("ErrorOccured.jpg", UriKind.Relative);
+            var uri = new Uri("ErrorOccured.jpg", UriKind.Relative);
+            this.AstronomyImage.Source = CreateBitmapImage(uri);
 
-                ImageViewer1.Source = CreateBitmapImage(uri);
-            }
+            this.DatePicker.IsEnabled = true;
+            this.DownloadingProgress.IsActive = false;
         }
 
         private async Task DisplayAstronomyPictureOfTheDay()
@@ -59,16 +57,21 @@ namespace AstronomyPictureOfTheDay
             this.astronomyPictureOfTheDay = await this.LoadAstronomyPictureOfTheDay();
             var image = await this.LoadImage();
 
-            if (TitleTextBox != null)
-                TitleTextBox.Text = this.astronomyPictureOfTheDay.title;
+            TitleTextBox.Text = this.astronomyPictureOfTheDay.title;
+            ExplanationTextBox.Text = this.astronomyPictureOfTheDay.explanation;
+            AstronomyImage.Source = image;
 
-            if (ExplanationTextBox != null)
-                ExplanationTextBox.Text = this.astronomyPictureOfTheDay.explanation;
+            this.DatePicker.IsEnabled = true;
+            this.DownloadingProgress.IsActive = false;
+        }
 
-            if (ImageViewer1 != null)
-            {
-                ImageViewer1.Source = image;
-            }
+        private void DisplayTransitionScreen()
+        {
+            this.DatePicker.IsEnabled = false;
+            this.TitleTextBox.Text = "";
+            this.ExplanationTextBox.Text = $"Downloading the astronomy picture of the day for {DatePicker.SelectedDate:yyyy-MM-dd}";
+            this.AstronomyImage.IsEnabled = false;
+            this.DownloadingProgress.IsActive = true;
         }
 
         private async Task<AstronomyPictureOfTheDayResponse> LoadAstronomyPictureOfTheDay()
@@ -79,7 +82,7 @@ namespace AstronomyPictureOfTheDay
             {
                 using var client = new WebClient();
 
-                var address = $"https://api.nasa.gov/planetary/apod?date={DatePicker.SelectedDate:yyyy-MM-dd}&api_key=DEMO_KEY";
+                var address = $"https://api.nasa.gov/planetary/apod?date={DatePicker.SelectedDate:yyyy-MM-dd}&api_key={this.NasaApiKey}";
                 await client.DownloadFileTaskAsync(address, file);
             }
 
