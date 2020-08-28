@@ -24,45 +24,46 @@ namespace AstronomyPictureOfTheDay
         public MainWindow()
         {
             InitializeComponent();
-            this.NasaApiKey = Environment.GetEnvironmentVariable("NASA_API_KEY") ?? "DEMO_KEY";
+            this.NasaApiKey = Environment.GetEnvironmentVariable("NASA_API_KEY", EnvironmentVariableTarget.Machine) ?? "DEMO_KEY";
         }
 
         private async void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
         {
             this.DisplayTransitionScreen();
+            
             try
             {
-                await this.DisplayAstronomyPictureOfTheDay();
+                this.astronomyPictureOfTheDay = await this.DownloadDefinitionForAstronomyPictureOfTheDay();
+                await this.DownloadImage();
+
+                this.UpdateUi(
+                    this.astronomyPictureOfTheDay.title,
+                    this.astronomyPictureOfTheDay.explanation,
+                    $".\\Samples\\APOD_{DatePicker.SelectedDate:yyyy-MM-dd}.jpg");
             }
             catch (Exception ex)
             {
-                this.DisplayErrorScreen(ex);
+                this.UpdateUi(
+                    "Ops.. Something went wrong..",
+                    ex.Message,
+                    "ErrorOccured.jpg");
             }
         }
-
-        private void DisplayErrorScreen(Exception exception)
+        
+        private void UpdateUi(string title, string explanation, string imagePath)
         {
-            this.TitleTextBox.Text = "Ops.. Something went wrong..";
-            this.ExplanationTextBox.Text = exception.Message;
+            this.TitleTextBox.Text = title;
+            this.ExplanationTextBox.Text = explanation;
+            this.AstronomyImage.Source = CreateBitmapImage(new Uri(imagePath, UriKind.Relative));
 
-            var uri = new Uri("ErrorOccured.jpg", UriKind.Relative);
-            this.AstronomyImage.Source = CreateBitmapImage(uri);
-
-            this.DatePicker.IsEnabled = true;
-            this.DownloadingProgress.IsActive = false;
+            this.FinalizeTransition();
         }
 
-        private async Task DisplayAstronomyPictureOfTheDay()
+        private void FinalizeTransition()
         {
-            this.astronomyPictureOfTheDay = await this.LoadAstronomyPictureOfTheDay();
-            var image = await this.LoadImage();
-
-            TitleTextBox.Text = this.astronomyPictureOfTheDay.title;
-            ExplanationTextBox.Text = this.astronomyPictureOfTheDay.explanation;
-            AstronomyImage.Source = image;
-
             this.DatePicker.IsEnabled = true;
-            this.DownloadingProgress.IsActive = false;
+            this.DownloadingProgressBar.Visibility = Visibility.Hidden;
+            this.AstronomyImage.Visibility = Visibility.Visible;
         }
 
         private void DisplayTransitionScreen()
@@ -70,11 +71,12 @@ namespace AstronomyPictureOfTheDay
             this.DatePicker.IsEnabled = false;
             this.TitleTextBox.Text = "";
             this.ExplanationTextBox.Text = $"Downloading the astronomy picture of the day for {DatePicker.SelectedDate:yyyy-MM-dd}";
-            this.AstronomyImage.IsEnabled = false;
-            this.DownloadingProgress.IsActive = true;
+            this.AstronomyImage.Visibility = Visibility.Hidden;
+            this.DownloadingProgressBar.Visibility = Visibility.Visible;
+            this.DownloadingProgressBar.Value = 0;
         }
 
-        private async Task<AstronomyPictureOfTheDayResponse> LoadAstronomyPictureOfTheDay()
+        private async Task<AstronomyPictureOfTheDayResponse> DownloadDefinitionForAstronomyPictureOfTheDay()
         {
             var file = $".\\Samples\\APOD_{DatePicker.SelectedDate:yyyy-MM-dd}.json";
 
@@ -91,7 +93,7 @@ namespace AstronomyPictureOfTheDay
             return JsonSerializer.Deserialize<AstronomyPictureOfTheDayResponse>(apodResponseAsString);
         }
         
-        private async Task<BitmapImage> LoadImage()
+        private async Task DownloadImage()
         {
             if (this.astronomyPictureOfTheDay.media_type != "image")
             {
@@ -100,16 +102,16 @@ namespace AstronomyPictureOfTheDay
 
             var url = this.astronomyPictureOfTheDay.hdurl ?? this.astronomyPictureOfTheDay.url;
 
-            var imageFile = $".\\Samples\\{Path.GetFileName(url)}";
-            if (!File.Exists(imageFile))
+            var file = $".\\Samples\\APOD_{DatePicker.SelectedDate:yyyy-MM-dd}.jpg";
+            if (!File.Exists(file))
             {
                 using var client = new WebClient();
-                await client.DownloadFileTaskAsync(url, imageFile);
+                client.DownloadProgressChanged += (s, e) =>
+                {
+                    this.DownloadingProgressBar.Value = e.ProgressPercentage;
+                };
+                await client.DownloadFileTaskAsync(url, file);
             }
-
-            var uri = new Uri(imageFile, UriKind.Relative);
-
-            return CreateBitmapImage(uri);
         }
 
         private static BitmapImage CreateBitmapImage(Uri uri)

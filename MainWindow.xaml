@@ -6,7 +6,7 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         Title="Astronomy Picture of The Day" Height="750" Width="525" Icon="app.ico">
-    <StackPanel>
+    <StackPanel Margin="10">
         <DatePicker x:Name="DatePicker"
                     SelectedDateChanged="DatePicker_OnSelectedDateChanged"
                     HorizontalAlignment="Center"></DatePicker>
@@ -23,7 +23,13 @@
                        HorizontalAlignment="Center">
             Select a date to show the astronomy picture of the day.
         </TextBlock>
-        <mah:ProgressRing x:Name="DownloadingProgress" IsActive="False" />
+        <ProgressBar x:Name="DownloadingProgressBar"
+                     Minimum="0"
+                     Maximum="100"
+                     Value="0"
+                     Visibility="Hidden"
+                     Height="15"
+                     Margin="30"/>
         <Image Name="AstronomyImage" Height="400" Width="400" />
     </StackPanel>
 </Window>
