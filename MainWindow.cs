@@ -49,9 +49,13 @@ namespace AstronomyPictureOfTheDay
             }
             catch (Exception ex)
             {
+                var innerMessage = ex.InnerException != null
+                    ? $".{Environment.NewLine}{ex.InnerException.Message}"
+                    : "";
+                
                 this.UpdateUi(
                     "Ops.. Something went wrong..",
-                    ex.Message,
+                    $"{ex.Message}{innerMessage}",
                     "ErrorOccured.jpg");
             }
         }
