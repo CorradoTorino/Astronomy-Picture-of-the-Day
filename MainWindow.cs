@@ -2,9 +2,11 @@
 // // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,12 +31,16 @@ namespace AstronomyPictureOfTheDay
 
         private async void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
         {
+            this.WriteDebugLine("Entering DatePicker_OnSelectedDateChanged");
             this.DisplayTransitionScreen();
             
             try
             {
                 this.astronomyPictureOfTheDay = await this.DownloadDefinitionForAstronomyPictureOfTheDay();
+                this.WriteDebugLine("Continue after DownloadDefinitionForAstronomyPictureOfTheDay");
+
                 await this.DownloadImage();
+                this.WriteDebugLine("Continue after DownloadImage");
 
                 this.UpdateUi(
                     this.astronomyPictureOfTheDay.title,
@@ -78,6 +84,8 @@ namespace AstronomyPictureOfTheDay
 
         private async Task<AstronomyPictureOfTheDayResponse> DownloadDefinitionForAstronomyPictureOfTheDay()
         {
+            this.WriteDebugLine("Entering DownloadDefinitionForAstronomyPictureOfTheDay"); 
+            
             var file = $".\\Samples\\APOD_{DatePicker.SelectedDate:yyyy-MM-dd}.json";
 
             if (!File.Exists(file))
@@ -85,16 +93,20 @@ namespace AstronomyPictureOfTheDay
                 using var client = new WebClient();
 
                 var address = $"https://api.nasa.gov/planetary/apod?date={DatePicker.SelectedDate:yyyy-MM-dd}&api_key={this.NasaApiKey}";
-                await client.DownloadFileTaskAsync(address, file);
+                await client.DownloadFileTaskAsync(address, file).ConfigureAwait(false);
+                this.WriteDebugLine("Continue after DownloadFileTaskAsync");
             }
 
-            var apodResponseAsString = File.ReadAllText(file);
+            var apodResponseAsString = await File.ReadAllTextAsync(file).ConfigureAwait(false);
+            this.WriteDebugLine("Continue after File.ReadAllTextAsync");
 
             return JsonSerializer.Deserialize<AstronomyPictureOfTheDayResponse>(apodResponseAsString);
         }
         
         private async Task DownloadImage()
         {
+            this.WriteDebugLine("Entering DownloadImage");
+
             if (this.astronomyPictureOfTheDay.media_type != "image")
             {
                 throw new NotSupportedException($"Not Supported media type: {this.astronomyPictureOfTheDay.media_type}");
@@ -110,19 +122,30 @@ namespace AstronomyPictureOfTheDay
                 {
                     this.DownloadingProgressBar.Value = e.ProgressPercentage;
                 };
-                await client.DownloadFileTaskAsync(url, file);
+
+                await client.DownloadFileTaskAsync(url, file).ConfigureAwait(false);
+                this.WriteDebugLine("Continue after client.DownloadFileTaskAsync");
             }
         }
 
         private static BitmapImage CreateBitmapImage(Uri uri)
         {
             var bitmap = new BitmapImage();
-
             bitmap.BeginInit();
             bitmap.UriSource = uri;
             bitmap.EndInit();
             bitmap.Freeze();
             return bitmap;
+        }
+
+        private void WriteDebugLine(string message ="")
+        {
+            var methodBase = new StackTrace().GetFrame(1).GetMethod();
+
+            Debug.WriteLine($"[{DateTime.Now:yyyy.MM.dd HH:mm:ss:ffff}] - " +
+                            $"[{methodBase.Name}] - " +
+                            $"[{Thread.CurrentThread.ManagedThreadId}] - " +
+                            $"{message}");
         }
     }
 }
