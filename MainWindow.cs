@@ -94,7 +94,7 @@ namespace AstronomyPictureOfTheDay
 
                 var address = $"https://api.nasa.gov/planetary/apod?date={DatePicker.SelectedDate:yyyy-MM-dd}&api_key={this.NasaApiKey}";
                 await client.DownloadFileTaskAsync(address, file).ConfigureAwait(false);
-                this.WriteDebugLine("Continue after DownloadFileTaskAsync");
+                this.WriteDebugLine($"Continue after DownloadFileTaskAsync {file}");
             }
 
             var apodResponseAsString = await File.ReadAllTextAsync(file).ConfigureAwait(false);
@@ -124,7 +124,7 @@ namespace AstronomyPictureOfTheDay
                 };
 
                 await client.DownloadFileTaskAsync(url, file).ConfigureAwait(false);
-                this.WriteDebugLine("Continue after client.DownloadFileTaskAsync");
+                this.WriteDebugLine($"Continue after DownloadFileTaskAsync {file}");
             }
         }
 
