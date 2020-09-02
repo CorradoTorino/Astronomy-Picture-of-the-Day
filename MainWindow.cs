@@ -30,7 +30,7 @@ namespace AstronomyPictureOfTheDay
             
             try
             {
-                this.astronomyPictureOfTheDay = await this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(this.DatePicker.SelectedDate);
+                this.astronomyPictureOfTheDay = await this.downloader.DownloadDefinitionForAstronomyPictureOfTheDayAsync(this.DatePicker.SelectedDate);
                 DebugUtils.WriteLine("Continue after DownloadDefinitionForAstronomyPictureOfTheDay");
 
                 await this.downloader.DownloadImage(this.astronomyPictureOfTheDay, this.DownloadingProgressBar);

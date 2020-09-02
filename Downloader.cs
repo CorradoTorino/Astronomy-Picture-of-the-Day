@@ -16,25 +16,63 @@ namespace AstronomyPictureOfTheDay
             this.NasaApiKey = Environment.GetEnvironmentVariable("NASA_API_KEY", EnvironmentVariableTarget.Machine) ?? "DEMO_KEY";
         }
 
-        public async Task<AstronomyPictureOfTheDayResponse> DownloadDefinitionForAstronomyPictureOfTheDay(DateTime? dateToDownload)
+        public async Task<AstronomyPictureOfTheDayResponse> DownloadDefinitionForAstronomyPictureOfTheDayAsync(DateTime? dateToDownload)
         {
-            DebugUtils.WriteLine("Entering DownloadDefinitionForAstronomyPictureOfTheDay");
-
-            var file = $".\\Samples\\APOD_{dateToDownload:yyyy-MM-dd}.json";
-
-            if (!File.Exists(file))
+            try
             {
-                using var client = new WebClient();
+                DebugUtils.WriteLine("Entering DownloadDefinitionForAstronomyPictureOfTheDay");
 
-                var address = $"https://api.nasa.gov/planetary/apod?date={dateToDownload:yyyy-MM-dd}&api_key={this.NasaApiKey}";
-                await client.DownloadFileTaskAsync(address, file).ConfigureAwait(false);
-                DebugUtils.WriteLine($"Continue after DownloadFileTaskAsync {file}");
+                var file = $".\\Samples\\APOD_{dateToDownload:yyyy-MM-dd}.json";
+
+                if (!File.Exists(file))
+                {
+                    using var client = new WebClient();
+
+                    var address = $"https://api.nasa.gov/planetary/apod?date={dateToDownload:yyyy-MM-dd}&api_key={this.NasaApiKey}";
+                    await client.DownloadFileTaskAsync(address, file).ConfigureAwait(false);
+                    DebugUtils.WriteLine($"Continue after DownloadFileTaskAsync {file}");
+                }
+
+                var apodResponseAsString = await File.ReadAllTextAsync(file).ConfigureAwait(false);
+                DebugUtils.WriteLine("Continue after File.ReadAllTextAsync");
+
+                return JsonSerializer.Deserialize<AstronomyPictureOfTheDayResponse>(apodResponseAsString);
             }
+            catch (Exception e)
+            {
+                DebugUtils.WriteLine($"Exception downloading date {dateToDownload}: {e.Message}");
+                throw;
+            }
+        }
 
-            var apodResponseAsString = await File.ReadAllTextAsync(file).ConfigureAwait(false);
-            DebugUtils.WriteLine("Continue after File.ReadAllTextAsync");
+        public AstronomyPictureOfTheDayResponse DownloadDefinitionForAstronomyPictureOfTheDay(DateTime? dateToDownload)
+        {
+            try
+            {
+                DebugUtils.WriteLine("Entering DownloadDefinitionForAstronomyPictureOfTheDay");
 
-            return JsonSerializer.Deserialize<AstronomyPictureOfTheDayResponse>(apodResponseAsString);
+                var file = $".\\Samples\\APOD_{dateToDownload:yyyy-MM-dd}.json";
+
+                if (!File.Exists(file))
+                {
+                    using var client = new WebClient();
+
+                    var address = $"https://api.nasa.gov/planetary/apod?date={dateToDownload:yyyy-MM-dd}&api_key={this.NasaApiKey}";
+                    client.DownloadFile(address, file);
+                    DebugUtils.WriteLine($"Continue after DownloadFileTaskAsync {file}");
+                }
+
+                var apodResponseAsString = File.ReadAllText(file);
+                DebugUtils.WriteLine("Continue after File.ReadAllTextAsync");
+
+                return JsonSerializer.Deserialize<AstronomyPictureOfTheDayResponse>(apodResponseAsString);
+
+            }
+            catch (Exception e)
+            {
+                DebugUtils.WriteLine($"Exception downloading date {dateToDownload}: {e.Message}");
+                throw;
+            }
         }
 
         public async Task DownloadImage(AstronomyPictureOfTheDayResponse astronomyPictureOfTheDay, ProgressBar downloadingProgressBar)
