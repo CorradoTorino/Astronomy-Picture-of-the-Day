@@ -23,13 +23,22 @@
                        HorizontalAlignment="Center">
             Select a date to show the astronomy picture of the day.
         </TextBlock>
-        <ProgressBar x:Name="DownloadingProgressBar"
-                     Minimum="0"
-                     Maximum="100"
-                     Value="0"
-                     Visibility="Hidden"
-                     Height="15"
-                     Margin="30"/>
+        <StackPanel Orientation="Horizontal" Margin="30">
+            <ProgressBar x:Name="DownloadingProgressBar"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="30"
+                         Visibility="Hidden"
+                         Height="20"
+                         Width="350"
+                         Margin="10"/>
+            <Button Name="CancelButton"
+                    Height="20"
+                    Width="50"
+                    Visibility="Hidden"
+                    Click="CancelButton_OnClick"
+                    >Cancel</Button>
+        </StackPanel>
         <Image Name="AstronomyImage" Height="400" Width="400" />
     </StackPanel>
 </Window>

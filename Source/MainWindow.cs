@@ -2,10 +2,11 @@
 // // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+
 
 namespace AstronomyPictureOfTheDay
 {
@@ -17,7 +18,9 @@ namespace AstronomyPictureOfTheDay
         private AstronomyPictureOfTheDayResponse astronomyPictureOfTheDay = null;
 
         private readonly Downloader downloader = new Downloader();
-        
+
+        private CancellationTokenSource cancellationTokenSource;
+            
         public MainWindow()
         {
             InitializeComponent();
@@ -26,20 +29,33 @@ namespace AstronomyPictureOfTheDay
         private async void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
         {
             DebugUtils.WriteLine("Entering DatePicker_OnSelectedDateChanged");
+
+            this.cancellationTokenSource = new CancellationTokenSource();
+
             this.DisplayTransitionScreen();
-            
+
             try
             {
-                this.astronomyPictureOfTheDay = await this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(this.DatePicker.SelectedDate);
+                this.astronomyPictureOfTheDay =
+                    await this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(this.DatePicker.SelectedDate,
+                        this.cancellationTokenSource.Token);
                 DebugUtils.WriteLine("Continue after DownloadDefinitionForAstronomyPictureOfTheDay");
 
-                await this.downloader.DownloadImage(this.astronomyPictureOfTheDay, this.DownloadingProgressBar);
+                await this.downloader.DownloadImage(this.astronomyPictureOfTheDay, this.DownloadingProgressBar,
+                    this.cancellationTokenSource.Token);
                 DebugUtils.WriteLine("Continue after DownloadImage");
 
                 this.UpdateUi(
                     this.astronomyPictureOfTheDay.title,
                     this.astronomyPictureOfTheDay.explanation,
                     $".\\Samples\\APOD_{DatePicker.SelectedDate:yyyy-MM-dd}.jpg");
+            }
+            catch (OperationCanceledException)
+            {
+                this.UpdateUi(
+                    "Operation Cancelled successfully.",
+                    $"The operation was cancelled as requested.",
+                    "StopWaiting.jpg");
             }
             catch (Exception ex)
             {
@@ -67,6 +83,7 @@ namespace AstronomyPictureOfTheDay
         {
             this.DatePicker.IsEnabled = true;
             this.DownloadingProgressBar.Visibility = Visibility.Hidden;
+            this.CancelButton.Visibility = Visibility.Hidden;
             this.AstronomyImage.Visibility = Visibility.Visible;
         }
 
@@ -78,6 +95,7 @@ namespace AstronomyPictureOfTheDay
             this.AstronomyImage.Visibility = Visibility.Hidden;
             this.DownloadingProgressBar.Visibility = Visibility.Visible;
             this.DownloadingProgressBar.Value = 0;
+            this.CancelButton.Visibility = Visibility.Visible;
         }
         
         private static BitmapImage CreateBitmapImage(Uri uri)
@@ -88,6 +106,11 @@ namespace AstronomyPictureOfTheDay
             bitmap.EndInit();
             bitmap.Freeze();
             return bitmap;
+        }
+
+        private void CancelButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            this.cancellationTokenSource.Cancel();
         }
     }
 }
