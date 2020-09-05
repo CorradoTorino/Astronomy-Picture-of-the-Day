@@ -43,7 +43,7 @@ namespace AstronomyPictureOfTheDay
             try
             {
                 this.astronomyPictureOfTheDay =
-                    this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(selectedDate, this.cancellationTokenSource.Token);
+                    this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(selectedDate);
                 DebugUtils.WriteLine("Continue after DownloadDefinitionForAstronomyPictureOfTheDay");
 
                 this.downloader.DownloadImage(this.astronomyPictureOfTheDay);
