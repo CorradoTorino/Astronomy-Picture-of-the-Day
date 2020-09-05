@@ -3,13 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="Astronomy Picture of The Day" Height="750" Width="525" Icon="app.ico">
+        Title="Astronomy Picture of The Day"
+        Height="700"
+        Width="525"
+        Icon="Astronomy.ico">
     <StackPanel Margin="10">
         <DatePicker x:Name="DatePicker"
                     SelectedDateChanged="DatePicker_OnSelectedDateChanged"
-                    HorizontalAlignment="Center"></DatePicker>
+                    HorizontalAlignment="Center"
+                    CalendarOpened="DatePicker_OnCalendarOpened"></DatePicker>
         <TextBlock x:Name="TitleTextBox"
                    TextWrapping="Wrap"
                    Margin="5"
@@ -17,6 +20,7 @@
                    FontWeight="Bold"
                    >
         </TextBlock>
+        <Image Name="AstronomyImage" Height="400" Width="400" />
         <TextBlock x:Name="ExplanationTextBox"
                        TextWrapping="Wrap"
                        Margin="5"
@@ -39,6 +43,5 @@
                     Click="CancelButton_OnClick"
                     >Cancel</Button>
         </StackPanel>
-        <Image Name="AstronomyImage" Height="400" Width="400" />
     </StackPanel>
 </Window>
