@@ -9,7 +9,11 @@ namespace AstronomyPictureOfTheDay
 {
     public static class HttpClientExtensions
     {
-        public static async Task DownloadFileAsync(this HttpClient client, string url, string fileName, IProgress<double> progress = null, CancellationToken token = default(CancellationToken))
+        public static async Task DownloadFileAsync(this HttpClient client,
+            string url,
+            string fileName,
+            IProgress<double> progress = null,
+            CancellationToken token = default(CancellationToken))
         {
             var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token);
 
@@ -61,13 +65,21 @@ namespace AstronomyPictureOfTheDay
                 File.Delete(fileName);
                 throw;
             }
-            
         }
 
-        public static Task DownloadFileAsync(this HttpClient client, string url, string fileName,
+        public static Task DownloadFileAsync(this HttpClient client,
+            string url,
+            string fileName,
             CancellationToken token = default(CancellationToken))
         {
             return DownloadFileAsync(client, url, fileName, null, token);
+        }
+
+        public static Task DownloadFileAsync(this HttpClient client,
+            string url,
+            string fileName)
+        {
+            return DownloadFileAsync(client, url, fileName, null, default(CancellationToken));
         }
     }
 }

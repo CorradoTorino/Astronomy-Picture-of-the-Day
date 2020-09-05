@@ -30,7 +30,7 @@ namespace AstronomyPictureOfTheDay
             InitializeComponent();
         }
 
-        private async void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
+        private void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
         {
             DebugUtils.WriteLine("Entering DatePicker_OnSelectedDateChanged");
 
@@ -43,11 +43,10 @@ namespace AstronomyPictureOfTheDay
             try
             {
                 this.astronomyPictureOfTheDay =
-                    await this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(selectedDate, this.cancellationTokenSource.Token);
+                    this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(selectedDate, this.cancellationTokenSource.Token);
                 DebugUtils.WriteLine("Continue after DownloadDefinitionForAstronomyPictureOfTheDay");
 
-                await this.downloader.DownloadImage(this.astronomyPictureOfTheDay, this.DownloadingProgressBar,
-                    this.cancellationTokenSource.Token);
+                this.downloader.DownloadImage(this.astronomyPictureOfTheDay);
                 DebugUtils.WriteLine("Continue after DownloadImage");
 
                 this.UpdateUi(
