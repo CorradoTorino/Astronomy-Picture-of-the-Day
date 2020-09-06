@@ -21,8 +21,6 @@ namespace AstronomyPictureOfTheDay.UI
 
         private readonly Downloader downloader = new Downloader();
 
-        private CancellationTokenSource cancellationTokenSource;
-
         private List<DateTime> unsupportedDays;
             
         public MainWindow()
@@ -35,8 +33,6 @@ namespace AstronomyPictureOfTheDay.UI
             DebugUtils.WriteLine("Entering DatePicker_OnSelectedDateChanged");
 
             var selectedDate = this.DatePicker.SelectedDate.GetValueOrDefault(DateTime.Now);
-
-            this.cancellationTokenSource = new CancellationTokenSource();
 
             this.DisplayTransitionScreen();
             
@@ -124,7 +120,6 @@ namespace AstronomyPictureOfTheDay.UI
 
         private void CancelButton_OnClick(object sender, RoutedEventArgs e)
         {
-            this.cancellationTokenSource.Cancel();
         }
 
         private void DatePicker_OnCalendarOpened(object sender, RoutedEventArgs e)
