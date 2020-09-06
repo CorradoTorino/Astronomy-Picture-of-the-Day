@@ -127,7 +127,7 @@ namespace AstronomyPictureOfTheDay.UI
             this.cancellationTokenSource.Cancel();
         }
 
-        private async void DatePicker_OnCalendarOpened(object sender, RoutedEventArgs e)
+        private void DatePicker_OnCalendarOpened(object sender, RoutedEventArgs e)
         {
             if (this.unsupportedDays != null)
             {
@@ -136,18 +136,6 @@ namespace AstronomyPictureOfTheDay.UI
             
             this.DatePicker.DisplayDateEnd = DateTime.Now;
             this.unsupportedDays = new List<DateTime>();
-
-            await foreach (var date in GetUnsupportedDays())
-            {
-                if (this.DatePicker.SelectedDate.GetValueOrDefault(DateTime.MinValue) != date)
-                {
-                    this.DatePicker.BlackoutDates.Add(new CalendarDateRange(date, date));
-                }
-                else
-                {
-                    this.unsupportedDays.Add(date);
-                }
-            }
         }
 
         private void setBlackoutDays()
@@ -157,35 +145,6 @@ namespace AstronomyPictureOfTheDay.UI
                 if (this.DatePicker.SelectedDate.GetValueOrDefault(DateTime.MinValue) != day)
                 {
                     this.DatePicker.BlackoutDates.Add(new CalendarDateRange(day, day));
-                }
-            }
-        }
-
-        private async IAsyncEnumerable<DateTime> GetUnsupportedDays()
-        {
-            var apodFiles = Directory.GetFiles(".\\Samples", "APOD_*.json");
-
-            foreach (var file in apodFiles)
-            {
-                DateTime? day = null;
-                try
-                {
-                    var apodResponseAsString = await File.ReadAllTextAsync(file);
-                    DebugUtils.WriteLine("Continue after File.ReadAllTextAsync");
-
-                    var apodResponse = JsonSerializer.Deserialize<AstronomyPictureOfTheDayResponse>(apodResponseAsString);
-                    if (apodResponse.media_type != "image")
-                    {
-                        day = apodResponse.date;
-                    }
-                }
-                catch (JsonException)
-                {
-                }
-
-                if (day.HasValue)
-                {
-                    yield return day.Value;
                 }
             }
         }
