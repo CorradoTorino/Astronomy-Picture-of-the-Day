@@ -52,8 +52,11 @@ namespace AstronomyPictureOfTheDay.UI
             if (!File.Exists(file))
             {
                 using var client = new HttpClient();
-                await client.DownloadFileAsync(url, file);
+                var task = client.DownloadFileAsync(url, file);
                 DebugUtils.WriteLine($"Continue after DownloadFileTaskAsync {file}");
+
+                task.Wait();
+                DebugUtils.WriteLine($"Continue after task.Wait of DownloadFileTaskAsync {file}");
             }
         }
 
