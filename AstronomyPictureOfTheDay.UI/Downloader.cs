@@ -17,7 +17,7 @@ namespace AstronomyPictureOfTheDay.UI
                               "DEMO_KEY";
         }
 
-        public AstronomyPictureOfTheDayResponse DownloadDefinitionForAstronomyPictureOfTheDay(DateTime? dateToDownload)
+        public async Task<AstronomyPictureOfTheDayResponse> DownloadDefinitionForAstronomyPictureOfTheDay(DateTime? dateToDownload)
         {
             DebugUtils.WriteLine("Entering DownloadDefinitionForAstronomyPictureOfTheDay");
 
@@ -25,13 +25,13 @@ namespace AstronomyPictureOfTheDay.UI
 
             if (!File.Exists(file))
             {
-                using var client = new WebClient();
+                using var client = new HttpClient();
                 var address = $"https://api.nasa.gov/planetary/apod?date={dateToDownload:yyyy-MM-dd}&api_key={this.NasaApiKey}";
-                client.DownloadFile(address, file);
+                await client.DownloadFileAsync(address, file);
                 DebugUtils.WriteLine($"Continue after DownloadFileTask {file}");
             }
 
-            var apodResponseAsString = File.ReadAllText(file);
+            var apodResponseAsString = await File.ReadAllTextAsync(file);
             DebugUtils.WriteLine("Continue after File.ReadAllText");
 
             return JsonSerializer.Deserialize<AstronomyPictureOfTheDayResponse>(apodResponseAsString);
