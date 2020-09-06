@@ -10,8 +10,8 @@
     <ProjectGuid>{DDBCF377-2D29-440D-9FDB-02B4936E2D80}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AstronomyPictureOfTheDay</RootNamespace>
-    <AssemblyName>AstronomyPictureOfTheDay</AssemblyName>
+    <RootNamespace>AstronomyPictureOfTheDay.UI</RootNamespace>
+    <AssemblyName>AstronomyPictureOfTheDay.UI</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

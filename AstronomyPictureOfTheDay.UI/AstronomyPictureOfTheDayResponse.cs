@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AstronomyPictureOfTheDay
+namespace AstronomyPictureOfTheDay.UI
 {
     public class AstronomyPictureOfTheDayResponse
     {

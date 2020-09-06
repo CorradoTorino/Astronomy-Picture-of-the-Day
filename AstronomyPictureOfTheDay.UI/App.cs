@@ -3,7 +3,7 @@
 
 using System.Windows;
 
-namespace AstronomyPictureOfTheDay
+namespace AstronomyPictureOfTheDay.UI
 {
     /// <summary>
     ///     Interaction logic for App.xaml

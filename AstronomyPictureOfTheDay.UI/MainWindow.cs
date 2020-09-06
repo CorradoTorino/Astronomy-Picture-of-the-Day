@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
-namespace AstronomyPictureOfTheDay
+namespace AstronomyPictureOfTheDay.UI
 {
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
@@ -42,7 +42,7 @@ namespace AstronomyPictureOfTheDay
             
             try
             {
-                this.astronomyPictureOfTheDay =
+                this.astronomyPictureOfTheDay = 
                     this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(selectedDate);
                 DebugUtils.WriteLine("Continue after DownloadDefinitionForAstronomyPictureOfTheDay");
 

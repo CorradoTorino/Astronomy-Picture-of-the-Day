@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 
-namespace AstronomyPictureOfTheDay
+namespace AstronomyPictureOfTheDay.UI
 {
     public static class DebugUtils
     {
