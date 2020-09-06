@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -28,7 +29,7 @@ namespace AstronomyPictureOfTheDay.UI
             InitializeComponent();
         }
 
-        private void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
+        private async void DatePicker_OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
         {
             DebugUtils.WriteLine("Entering DatePicker_OnSelectedDateChanged");
 
@@ -42,7 +43,7 @@ namespace AstronomyPictureOfTheDay.UI
                     this.downloader.DownloadDefinitionForAstronomyPictureOfTheDay(selectedDate);
                 DebugUtils.WriteLine("Continue after DownloadDefinitionForAstronomyPictureOfTheDay");
 
-                this.downloader.DownloadImage(this.astronomyPictureOfTheDay);
+                await this.downloader.DownloadImage(this.astronomyPictureOfTheDay);
                 DebugUtils.WriteLine("Continue after DownloadImage");
 
                 this.UpdateUi(

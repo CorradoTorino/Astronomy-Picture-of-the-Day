@@ -37,7 +37,7 @@ namespace AstronomyPictureOfTheDay.UI
             return JsonSerializer.Deserialize<AstronomyPictureOfTheDayResponse>(apodResponseAsString);
         }
         
-        public void DownloadImage(AstronomyPictureOfTheDayResponse astronomyPictureOfTheDay)
+        public async Task DownloadImage(AstronomyPictureOfTheDayResponse astronomyPictureOfTheDay)
         {
             DebugUtils.WriteLine("Entering DownloadImage");
 
@@ -51,8 +51,8 @@ namespace AstronomyPictureOfTheDay.UI
             var file = $".\\Samples\\APOD_{astronomyPictureOfTheDay.date:yyyy-MM-dd}.jpg";
             if (!File.Exists(file))
             {
-                using var client = new WebClient();
-                client.DownloadFile(url, file);
+                using var client = new HttpClient();
+                await client.DownloadFileAsync(url, file);
                 DebugUtils.WriteLine($"Continue after DownloadFileTaskAsync {file}");
             }
         }
